@@ -1,0 +1,71 @@
+---
+title: "Activity: Scraping Nuclear reactors"
+author: "Mohil  Patel"
+date: "2/22/2022"
+output: html_notebook
+---
+
+
+title: "Activity: Scraping Nuclear reactors"
+author: "Mohil  Patel"
+date: "2/22/2022"
+output: html_notebook
+---
+
+
+
+# Set Up
+
+```{r}
+# load necessary packages
+library(tidyverse)
+library(mosaic)
+library(dcData)
+library(xml2)
+library(rvest)
+library(lubridate)
+```
+
+
+```{r}
+page <- "http://en.wikipedia.org/wiki/List_of_nuclear_reactors"
+tableList <- page %>%
+  read_html() %>%
+  html_nodes(css = "table") %>%
+  html_table(fill = TRUE)
+Japan <-
+  tableList[[23]]
+Japan
+```
+
+```{r}
+names(Japan)[c(3)] <- c("type")
+
+Japan <- 
+  Japan %>%
+  filter(row_number() > 1) %>%  
+  rename(name = Name, 
+         reactor = `UnitNo.`, 
+         model = Reactor, 
+         status = Status, 
+         netMW = `Net capacity (MW)`, 
+         operation = `Commercial operation`, 
+         closure = Closure) 
+```
+
+```{r}
+glimpse(Japan)
+```
+
+```{r}
+
+Japan<-
+  rename(construction = `Construction start`)
+```
+
+```{r}
+Japan <- 
+  Japan %>%
+  mutate(netMW=as.numeric(netMW)) %>%
+  mutate(`Construcition start`=dmy(Japan$`Construction start`)) 
+```

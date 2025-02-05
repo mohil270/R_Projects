@@ -1,0 +1,115 @@
+---
+title: "HELPrct (Data Verbs) Activity"
+author: "Mohil Patel"
+date: "March 2, 2022"
+output: html_notebook
+---
+
+
+## Set Up:
+
+```{r}
+# load packages
+library(tidyverse)  # for data verbs like `group-by()` & `summarise()`
+library(mosaicData) # includes `HELPrct` data set 
+library(mosaic)     # includes `mplot()` interactive plot builder
+library(esquisse)   # includes `esquisser()` interactive plot builder
+
+
+# Load the HELPrct data from `mosaicData` into our RStudio environment
+data("HELPrct", package = "mosaicData")
+
+```
+
+
+## Data Description
+
+```{r}
+glimpse(HELPrct)
+
+```
+
+*TASK 1: Write a couple of sentences describing the `HELPrct` data--What is the setting for the data? What are they about?* 
+
+The data is looking at individuals who have struggled with drug abuse. A case is a person who struggles with drug abuse. The variables help describe each individuals drug abuse situation as well as their life situation
+
+
+## Basic Summaries with `summarise()` 
+
+*TASK 2: Produce an expression involving `summarize()` and `HELPrct` that will produce the following.*
+
+1. *number of people (cases) in `HELPrct` study*
+2. *combined total number of times in the past 6 months all the people in `HELPrct` entered a detox program (measured at baseline)* 
+3. *mean time (in days) to first use of any substance post-detox for all the people in `HELPrct`*
+
+
+```{r}
+HELPrct %>%
+  summarise( total_people = n(),total_detox= sum(e2b,na.rm=TRUE),use_mean = mean(daysanysub,na.rm=TRUE) ) 
+
+```
+```{r}
+HELPrct %>%
+  summarise( use_mean = mean(daysanysub,na.rm=TRUE) )
+
+
+```
+
+
+## Subgrouping with `group_by()` 
+
+*TASK 3: Repeat task 2 above, but calculate the results group-by-group.  Show your code and write a sentence or two about what you observe in the results for each of the following:* 
+
+1. *males versus females*
+
+```{r}
+HELPrct %>%
+  group_by(female)%>%
+  summarise( total_people = n(),total_detox= sum(e2b,na.rm=TRUE),use_mean = mean(daysanysub,na.rm=TRUE) ) 
+```
+
+
+2. *homeless or not*
+
+```{r}
+HELPrct %>%
+  group_by(homeless)%>%
+  summarise( total_people = n(),total_detox= sum(e2b,na.rm=TRUE),use_mean = mean(daysanysub,na.rm=TRUE) ) 
+```
+
+3. *substance*
+
+```{r}
+HELPrct %>%
+  group_by(substance)%>%
+  summarise( total_people = n(),total_detox= sum(e2b,na.rm=TRUE),use_mean = mean(daysanysub,na.rm=TRUE) ) 
+```
+
+4. *break down the homeless versus housed further, by sex*
+
+```{r}
+HELPrct %>%
+  group_by(female,homeless) %>%
+  summarise( total_people = n(),total_detox= sum(e2b,na.rm=TRUE),use_mean = mean(daysanysub,na.rm=TRUE))
+```
+
+5. *break down the homeless versus housed further, by substance*
+
+```{r}
+HELPrct %>%
+  group_by(homeless,substance)%>%
+  summarise( total_people = n(),total_detox= sum(e2b,na.rm=TRUE),use_mean = mean(daysanysub,na.rm=TRUE) ) 
+```
+
+
+## TASK 4:
+
+*Include one or more interesting plots of the data involving at least 3 variables per plot. Write a few sentences to explain the story that your plot tells about these data.  You can use one of the relationships that you studied in Task 2, or you can explore a different group of variables in the `HELPrct` that show something interesting.*  
+
+The graph below shows the relationship between the age and drug risk for each of the substances. As you can seee that heroin is a very risky drug to take at any stage as compared to alcohol and cocaine
+```{r}
+ggplot(data = HELPrct, aes(x = age, y = drugrisk)) + geom_point()  + facet_wrap(~substance, ncol = 4) + labs(title = "")
+
+```
+
+

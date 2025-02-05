@@ -1,0 +1,211 @@
+---
+title: "Street or road"
+author: "Mohil Patel"
+date: "4/12/2022"
+output: 
+    html_notebook:
+    fig_height: 6
+    fig_width: 10
+---
+
+
+# Set Up
+
+### Clean up environment and load packages
+```{r}
+library(mosaic)
+library(rvest)
+library(tidyverse)
+library(lubridate)
+
+```
+
+### Data Intake
+
+
+
+```{r}
+download.file(url="https://mdbeckman.github.io/dcSupplement/data/street-addresses.csv", 
+              destfile = "voteraddresses.csv")
+```
+
+
+
+```{r}
+voteraddresses <- read.csv("voteraddresses.csv")
+```
+
+1. 15000 street addresses of registered voters 
+   900,000 medicare service providers addresses.
+  
+
+2.
+
+```{r}
+download.file(url="https://mdbeckman.github.io/dcSupplement/data/CMS_ProvidersSimple.rds",
+              destfile = "MohilPatel.rds")
+
+```
+```{r}
+DataTable <- readRDS("MohilPatel.rds")
+```
+
+3. 
+
+```{r}
+nrow(voteraddresses)
+```
+
+```{r}
+nrow(DataTable)
+
+
+```
+
+```{r}
+Sam <- 
+  voteraddresses %>%
+  sample_n(size = 50)
+print(Sam)
+
+```
+
+```{r}
+
+Match  <- 
+  Sam %>%
+  filter(grepl(pattern = "PO", address))
+print(Match)
+```
+
+```{r}
+X <- 
+  Sam %>%
+  filter( !grepl(pattern = "PO", address))
+print(X)
+```
+
+```{r}
+pattern <- "BOX\\s+(\\d+)"
+
+Match <- 
+  Sam %>% 
+  filter(grepl(pattern, address))
+
+X <-
+  Sam %>%
+  filter( !grepl(pattern, address))
+print(X)
+
+```
+```{r}
+BN<- 
+  Sam %>%
+  filter(grepl(pattern, address)) %>%
+  tidyr::extract(address, into = "boxnum", regex = pattern)
+print(BN)
+```
+
+```{r}
+Y <-
+bind_rows(voteraddresses,DataTable)
+
+
+```
+
+```{r}
+pattern <- "(ST|RD|ROAD|CIRCLE|WAY|TRAIL|DRIVE|DR|LANE|LN|CT|COURT|AVE|AVENUE|PL)" 
+Left <- 
+  Y %>% #  
+  filter( !grepl(pattern, address), 
+          !grepl("\\sAPT|UNIT\\s[\\d]+$", address),
+          !grepl(" BOX ", address) 
+          ) 
+Left
+
+```
+```{r}
+descpat<- 
+  Y%>%
+  filter(grepl(pattern, address)) %>%
+  tidyr::extract(address, into = "new_pattern_desc", regex = pattern)
+descpat
+
+```
+
+```{R}
+z <-
+  descpat %>%
+  group_by(new_pattern_desc) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
+z
+
+```
+
+```{R}
+DESCVOTER <- 
+  voteraddresses%>%
+  filter(grepl(pattern, address)) %>%
+  tidyr::extract(address, into = "new_voter_desc", regex = pattern)
+DESCVOTER
+
+```
+
+```{R}
+
+newDESCVOTER <-
+  DESCVOTER %>%
+  group_by(new_voter_desc) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
+newDESCVOTER
+
+
+```
+
+```{R}
+
+newDESCVOTER %>%
+  ggplot(aes(x= new_voter_desc, y = count))+
+  geom_bar(stat = 'identity')+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+```{R}
+DESCPROVIDER <- 
+  DataTable%>%
+  filter(grepl(pattern, address)) %>%
+  tidyr::extract(address, into = "new_provider_desc", regex = pattern)
+DESCPROVIDER
+
+
+```
+
+
+```{R}
+
+newDESCPROVIDER<-
+  DESCPROVIDER %>%
+  group_by(new_provider_desc) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
+newDESCPROVIDER
+
+```
+
+
+```{r}
+
+newDESCPROVIDER  %>%
+  ggplot(aes(x= new_provider_desc, y = count))+
+  geom_bar(stat = 'identity')+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+```{r}
+
+```

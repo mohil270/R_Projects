@@ -1,0 +1,90 @@
+---
+title: "Activity: Popular Names"
+author: "Mohil  Patel"
+date: "2/22/2022"
+output: html_notebook
+---
+
+
+
+# Set Up
+
+```{r}
+# load necessary packages
+library(tidyverse)
+library(mosaic)
+library(dcData)
+```
+
+
+```{r}
+# Load the BabyNames data into RStudio environment (from dcData package)
+data("BabyNames")
+
+```
+
+# Activity
+
+**Goal**: By the end of the activity, each person will create a graph showing ups and downs in the popularity of four names according to the U.S. social security administration  
+
+
+### Step 1
+
+```{r}
+glimpse(BabyNames)
+
+```
+```{r}
+
+BabyNames %>%
+  filter(name =="Franklin" )
+
+
+```
+
+### Step 3
+
+The variable sex from the raw data table do not appear at all in the graph.
+
+The variable count might have been transformed into Popularity. Also Name and year remain as the same in the graph.
+
+
+
+### Step 4
+
+Yes, the Names have been filtered to provide only Males names:
+Abraham
+Franklin
+Woodrow
+
+And then group by sex. 
+
+The new Variable of Population has been introduced which corresponds with the count variable.
+
+
+
+### Step 5
+ Filter the Names  and that they are male.
+ As well as grouping done by sex to collapse the sex column. 
+ 
+
+
+### Step 7: modify the starter code given in the book to produce your own R code..
+
+```{r}
+GlyphReadyForm <- BabyNames %>%
+  filter(name %in% c("David", "James", "Mohil"), sex == "M") %>%
+  group_by(sex)
+
+
+head(GlyphReadyForm)
+```
+
+```{r}
+GlyphReadyForm %>% 
+  ggplot(aes(x = year, y = count, group = name)) +
+  geom_line( size = 1, alpha = 0.5, aes(color = name)) +
+  ylab("Popularity") + xlab("Year")
+
+
+```
